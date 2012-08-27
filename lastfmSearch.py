@@ -13,12 +13,24 @@ class Lastfm:
         "&api_key=" + self.api_key + "&limit=100"
         return url
 
+    def urlArtist(self, artist_name):
+        url = self.base_url + "artist.getinfo&artist=" + artist_name +\
+        "&api_key=" + self.api_key
+        return url
+
     def fetch(self, user):
         req = urllib2.Request(self.url(user))
         response = urllib2.urlopen(req)
         xml_response = response.read()
         dom = parseString(xml_response)
         self.parseArtists(dom)
+
+    def fetchArtist(self, artist):
+        req = urllib2.Request(self.urlArtist(artist))
+        response = urllib2.urlopen(req)
+        xml_response = response.read()
+        dom = parseString(xml_response)
+        return self.getArtist(dom, 0)
 
     def parseArtists(self, dom):
         self.artists = []
