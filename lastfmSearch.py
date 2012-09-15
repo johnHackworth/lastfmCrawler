@@ -5,12 +5,14 @@ class Lastfm:
     api_key = '1a1f50151cb39efc730eac9ba810e585'
     base_url = 'http://ws.audioscrobbler.com/2.0/?method='
 
+
     def __init__(self):
         self.artists = []
+        self.number_of_artists=100
 
     def url(self, username):
         url = self.base_url + "user.gettopartists&user=" + username +\
-        "&api_key=" + self.api_key + "&limit=100"
+        "&api_key=" + self.api_key + "&limit="+str(self.number_of_artists)
         return url
 
     def urlArtist(self, artist_name):
@@ -18,7 +20,8 @@ class Lastfm:
         "&api_key=" + self.api_key
         return url
 
-    def fetch(self, user):
+    def fetch(self, user, number_of_artists=100):
+        self.number_of_artists = number_of_artists
         req = urllib2.Request(self.url(user))
         response = urllib2.urlopen(req)
         xml_response = response.read()
@@ -47,7 +50,7 @@ class Lastfm:
     def getArtist(self, dom, index):
         artist = dom.getElementsByTagName('artist')[index]
         artistData = {}
-        artistData['name'] = artist.getElementsByTagName('name')[0].firstChild.nodeValue
+        artistData['name'] = artist.getElementsByTagName('name')[0].firstChild.nodeValue.encode('utf8')
         for image in artist.getElementsByTagName('image'):
             if image.getAttribute('size') == 'small':
                 artistData['thumbnail'] = image.firstChild.nodeValue
