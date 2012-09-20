@@ -1,3 +1,4 @@
+import urllib
 import urllib2
 from xml.dom.minidom import parse, parseString
 
@@ -29,7 +30,8 @@ class Lastfm:
         self.parseArtists(dom)
 
     def fetchArtist(self, artist):
-        req = urllib2.Request(self.urlArtist(artist))
+        url = urllib.quote(self.urlArtist(artist), safe="%/:=&?~#+!$,;'@()*[]")
+        req = urllib2.Request(url)
         response = urllib2.urlopen(req)
         xml_response = response.read()
         dom = parseString(xml_response)
@@ -53,9 +55,18 @@ class Lastfm:
         artistData['name'] = artist.getElementsByTagName('name')[0].firstChild.nodeValue.encode('utf8')
         for image in artist.getElementsByTagName('image'):
             if image.getAttribute('size') == 'small':
-                artistData['thumbnail'] = image.firstChild.nodeValue
+                try:
+                    artistData['thumbnail'] = image.firstChild.nodeValue
+                except:
+                    artistData['thumbnail'] = ''
             elif image.getAttribute('size') == 'medium':
-                artistData['image'] = image.firstChild.nodeValue
+                try:
+                    artistData['image'] = image.firstChild.nodeValue
+                except:
+                    artistData['image'] = ''
             elif image.getAttribute('size') == 'large':
-                artistData['largeImage'] = image.firstChild.nodeValue
+                try:
+                    artistData['largeImage'] = image.firstChild.nodeValue
+                except:
+                    artistData['largeImage'] =  ''
         return artistData
